@@ -1,5 +1,11 @@
 # RIHAISH project rules
 
+- Current phase is FYP/product completion. Preserve and improve the genuine DDS implementation; do not rebuild the application or reintroduce artificial customer-population/traction demonstrations.
+- Work one reversible milestone at a time: recover context, define scope, implement, run targeted checks, record evidence, commit and update the checkpoint. Maintain recoverable source/data snapshots; never rewrite shared Git history.
+- Complete real AI/ML/property intelligence incrementally. Track provenance and distinguish observed source evidence, generated fixtures, estimates and predictions; never assert forecast accuracy without validation.
+- Government verification requires traceable authority evidence and honest review status. Preserve frontend/RBAC while reviewing unsupported claims in a separately scoped content/integration milestone.
+- Never fabricate customer counts, market traction, partnerships, product features or benchmark results. Keep private datasets/runtime/credentials out of Git and scan staged content plus intended history before publication.
+
 - Read docs/CODEX_CHECKPOINT.md, docs/CODEX_HANDOFF.md and docs/DDS_EXECUTION_TRACKER.md before continuing. Reuse the earlier audit; verify relevant claims only.
 - Preserve the React design, navigation, dashboards, API response fields, JWT secret, bcrypt hashes, roles and existing data.
 - Never reset changes, delete database records/volumes, or run destructive migrations without explicit user approval. The legacy test_e2e_full.py deletes user records: never run it against retained data.

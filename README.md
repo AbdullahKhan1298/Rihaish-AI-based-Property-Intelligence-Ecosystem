@@ -1,69 +1,143 @@
-# RIHAISH — An AI-Powered Property & Society Intelligence Ecosystem
+# RIHAISH — AI-based Property Intelligence Ecosystem
 
-> **DDS recovery (October 26, 2026):** Native three-node rqlite, two API instances and Caddy are available. Start with [the current DDS runbook](docs/DDS_RUNBOOK.md) and [verified progress](docs/DDS_EXECUTION_TRACKER.md). The older SQLite simulator description below is historical and does not establish fault tolerance.
+RIHAISH is an FYP prototype for property discovery and decision support in Pakistan, with a React interface, FastAPI services, and a real Raft-replicated relational database.
 
-RIHAISH is an end-to-end, data-driven web platform for real estate discovery, evaluation, and predictive investment intelligence across Pakistan's urban centers (Karachi, Lahore, Islamabad/Rawalpindi) and high-growth emerging development corridors.
+## The problem we address
 
----
+A buyer comparing properties in Karachi, Lahore or Islamabad/Rawalpindi needs more than an asking price. They need to understand which records support a listing, where its price history came from, what facilities are nearby, and whether construction updates are current. Those questions involve different sources, different geographic contexts, and different levels of confidence.
 
-## 🌟 Key Capabilities & Unique AI Features
+RIHAISH's goal is to bring that information into a traceable workflow for buyers, investors, society operators and administrators. The product should distinguish source evidence, estimates and predictions so a polished interface does not imply facts that have not been verified.
 
-1. **5-Year AI Price Forecasting & Trajectory Modeling**:
-   - Time-series ARIMA and multivariate growth algorithms forecasting property and society valuations over 1, 3, and 5-year outlooks with upper & lower statistical confidence intervals.
-   - Clear investment recommendations (*STRONG BUY*, *BUY*, *HOLD*) and dynamic ROI calculations.
+## Our approach and current scope
 
-2. **100% Government Lease (Leez) & Legal Transparency**:
-   - Every listed plot is linked to verified municipal and development authority records (KDA 99-Year Leasehold, LDA Allotment Letter, RDA Masterplan NOC, CDA NOC).
-   - Zero opacity: NOC serials, issuing authority seals, and audit timestamps are surfaced directly to buyers and investors before any transaction.
+- Search properties by city and text, apply numerical price filters, sort globally and paginate through SQL-backed results.
+- Support account/login, JWT authorization, role checks, watchlists and administration through the existing API and role-specific screens.
+- Present property/society information with price trajectories, facility-distance estimates, government-record fields and construction-update views.
+- Keep relational data replicated across three rqlite voters, with two FastAPI instances behind Caddy.
 
-3. **Facility & Location Intelligence Radar**:
-   - Proximity scorecard calculating geospatial Haversine distance and real-world urban drive times to nearest Mosques (Jamia Masjids), Top Schools & Universities, Tertiary Hospitals, Commercial Bazaars & Food Streets, and Main Expressways / Motorways.
+The reliable distributed data layer is implemented and functionally verified. The intelligence modules and commercial workflows are a prototype: forecasts are not validated investment returns, government-record fields are not independent title certification, and payments are not a production payment integration.
 
-4. **Real-Time Construction Progress Tracking**:
-   - Under-construction housing schemes upload dated milestone reports (overall % completion, milestone logs, verified site photographs).
-   - Verified on-ground by Rihaish audit team, eliminating the need for physical site visits.
+**No customer-population or production-scale claim is made.** The DDS-only massive synthetic-user generator has been retired. Legitimate k6 and concurrency tests remain; sustained-load acceptance is unresolved.
 
-5. **Horizontally Distributed Database Sharding**:
-   - Scalable architecture partitioned by `city_id` across independent regional shards:
-     - `shard-khi`: Karachi Metropolitan Shard (DHA, Scheme 33, Northern Bypass Corridor, Surjani)
-     - `shard-lhr`: Lahore Shard (DHA Phase 9, LDA City, Bahria Orchard, Al-Kabir Town)
-     - `shard-isb`: Islamabad / Rawalpindi Shard (Capital Smart City, Faisal Town 2, New Metro City, Gulberg Greens)
-   - Primary-to-replica automatic failover simulator integrated into the Master Admin Console.
+See [current FYP status](docs/FYP_CURRENT_STATUS.md), [supervisor demo](docs/FYP_SUPERVISOR_DEMO.md), and [roadmap](docs/RIHAISH_FYP_ROADMAP.md).
 
----
+## Architecture
 
-## 👥 Role-Based Architecture & Secure Navigation
+```mermaid
+flowchart LR
+    UI[React / Vite :3000] --> LB[Caddy :8000]
+    LB --> API1[FastAPI api1 :8001]
+    LB --> API2[FastAPI api2 :8002]
+    API1 --> DB
+    API2 --> DB
+    subgraph DB[Raft-replicated rqlite cluster]
+        N1[Node 1 :4001] <--> N2[Node 2 :4003]
+        N2 <--> N3[Node 3 :4005]
+        N3 <--> N1
+    end
+```
 
-- **Public Visitors**: Home, Search & Filters, Property Details, Free Valuation Tools. (Restricted admin and investor dashboards are securely hidden from the public navigation header).
-- **Investor Pro (Post-Login)**: Portfolio Watchlist, AI 1/3/5-Year Forecasting Sandbox, Comparative Society Liquidity Matrix, Construction Milestone Timeline Feed.
-- **Society Admin (B2B)**: Inventory Manager (Add/Edit plots, set price, upload NOC records), Construction Milestone Uploader, B2B Subscription management.
-- **Rihaish Master Authority (`/admin/login`)**: Society Verification Queue (Approve/Reject NOC certificates), Shard Health Monitor & Failover Simulator, Platform-wide metrics.
+All three database processes are voting members with separate stores. Leadership is elected dynamically. Each node replicates the full database; city-prefixed tables are **logical namespaces**, not independently hosted geographic shards. The current deployment runs on one Windows laptop and demonstrates process-failure tolerance, not independent-host or power-failure tolerance.
 
----
+The adapter preserves parameterized SQL, commits buffered writes as a Raft transaction, performs linearizable reads, and does not silently fall back to SQLite when DDS storage is unavailable. Uncertain writes are not blindly replayed. Uniqueness constraints, atomic watchlist operations and conditional OTP consumption are retained.
 
-## 🚀 Free-Tier Tech Stack & Deployment Guide
+A controlled ten-property query comparison reduced database HTTP calls from **42 to 3** with matching response hashes. This is a query-batching result, not a throughput or million-user benchmark. Historical failover evidence and operational detail remain in [the DDS runbook](docs/DDS_RUNBOOK.md).
 
-### 1. Frontend (React + Vite + Tailwind CSS)
-- **Local Run**:
-  ```bash
-  cd frontend
-  npm install
-  npm run dev
-  ```
-- **Free Deployment**:
-  - Deployable on **Vercel** or **Netlify** with zero configuration (via `vercel.json`).
+## Technology
 
-### 2. Backend API (Python FastAPI)
-- **Local Run**:
-  ```bash
-  cd backend
-  pip install -r requirements.txt
-  python run.py
-  ```
-  - Interactive Swagger API Documentation: `http://localhost:8000/docs`
-- **Free Deployment**:
-  - Deployable on **Render** (Free Web Service via `render.yaml`) or **Railway** / **Fly.io**.
+- React 18, React Router, Vite 6, Tailwind CSS, Recharts and Lucide.
+- Python 3.12, FastAPI/Pydantic, Uvicorn, HTTPX, JWT and bcrypt.
+- rqlite 10.6.5, Caddy 2.11.7; optional k6 2.3.0 for retained load tests.
+- NumPy, pandas and scikit-learn dependencies support the prototype intelligence code. The current trajectory engine includes growth assumptions/backcasts; out-of-sample forecasting accuracy is not established.
 
----
+## Local setup — Windows PowerShell
 
-© 2026 RIHAISH Technologies Inc. All Rights Reserved.
+Prerequisites: Git, Python 3.12 and Node.js/npm. The checked environment used Python 3.12.6 and Node 24.18.0. Native DDS launchers bind to loopback. Docker/Render files are retained backend templates, not a verified three-node production deployment.
+
+```powershell
+git clone https://github.com/AbdullahKhan1298/Rihaish-AI-based-Property-Intelligence-Ecosystem.git
+Set-Location Rihaish-AI-based-Property-Intelligence-Ecosystem
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r backend/requirements-windows.lock.txt
+npm.cmd ci --prefix frontend
+New-Item -ItemType Directory -Force .runtime,docs/evidence | Out-Null
+```
+
+The Windows lock records the installed dependency closure used for this baseline. The broader `backend/requirements.txt` remains available; other platforms and a fresh install of the locked environment are not yet independently validated.
+
+For a **new clone only**, create local configuration without overwriting an existing key:
+
+```powershell
+if (-not (Test-Path backend/.env)) {
+    Copy-Item backend/.env.example backend/.env
+    python -c "import secrets; from pathlib import Path; p=Path('backend/.env'); p.write_text(p.read_text().replace('SECRET_KEY=', 'SECRET_KEY='+secrets.token_urlsafe(48), 1))"
+}
+```
+
+An explicit `SECRET_KEY` is required. Keep an existing installation's key and password hashes unchanged. SMTP/Kaggle credentials are optional local configuration; mail delivery and external ingestion need their own verification. Never commit `.env`.
+
+### Data setup for a fresh clone
+
+This is a **source-only repository**. Original databases, rqlite stores, credentials, backups, raw scraped datasets and recorded response payloads are deliberately not distributed. A clone does not contain the retained working dataset.
+
+Obtain authorized, consistent source snapshots from the project owner. The migration takes the four authoritative files (`auth_core.db` and three `shard_<city>_primary.db` files). Keep all seven original files/replicas when preserving an existing installation. For a genuinely new, empty cluster only:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install_dds_tools.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dds_cluster.ps1 -Action start
+# Replace the path with your authorized quiesced snapshots; choose a NEW candidate filename.
+python scripts/migrate_dds.py --source-dir YOUR_PRIVATE_SNAPSHOT_DIRECTORY --output .runtime/migration/first-import.db --import-empty-cluster
+```
+
+The migration refuses an occupied target. **Do not import again on the retained working machine.** If a write/import response is interrupted, inspect state rather than blindly retrying. Use `--verify-only` with a new candidate path for a read-only source/cluster comparison. Schema initialization and seeding are not performed by DDS API startup.
+
+### Resume an existing migrated installation
+
+Use its established Python environment so the owned-process launcher's executable checks remain consistent:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dds_cluster.ps1 -Action start
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dds_services.ps1 -Action start
+Invoke-RestMethod http://127.0.0.1:8000/api/health/ready
+```
+
+In another terminal:
+
+```powershell
+Set-Location frontend
+npm.cmd run dev -- --host 127.0.0.1 --port 3000 --strictPort
+```
+
+Open http://127.0.0.1:3000 and API documentation at http://127.0.0.1:8000/docs. Reuse healthy processes rather than launching duplicates. Do not run legacy `start_servers.bat` alongside DDS: its single API conflicts with Caddy's port.
+
+SQLite is retained as an explicitly selected legacy/local mode; the DDS launchers always select `RIHAISH_DB_BACKEND=rqlite`. There is no automatic SQLite fallback on cluster failure.
+
+## Verification
+
+```powershell
+# Isolated fixture tests: no retained user data is deleted.
+python -m unittest discover -s tests -v
+npm.cmd run build --prefix frontend
+
+# Real non-disruptive checks, with authorized data and running services.
+python scripts/verify_dds_smoke.py --frontend
+python scripts/verify_dds_auth.py --output docs/evidence/fyp-auth.json
+
+# Before committing/publishing: staged content plus all reachable Git history.
+python scripts/check_publication.py --history
+```
+
+The live auth verifier creates and cleans only its own UUID-labelled fixtures and sends no mail. On this working copy there were zero original users; tests do not claim real customer migration. `verify_dds_data.py` additionally checks private recovery manifests/source files on the retained machine. Use the migration verifier with your own authorized snapshots on a fresh clone.
+
+Do **not** run root `test_e2e_full.py` against retained data: it is a destructive historical test. Controlled real node-failure commands remain in the DDS runbook; they are not necessary for normal startup or every commit. The unchanged k6 runner is `scripts/run_k6.ps1`; preserve failed results and interpret actual completed-request counts before making acceptance claims.
+
+## Known limitations and next milestone
+
+- Sustained-load/large-burst qualification is open; no million-user capacity claim. Overload admission code is retained, with incomplete end-to-end overload acceptance.
+- The current retained copy has 224 properties, 18 societies and 134 inherited missing society references. Search retains denormalized listings; joins to missing parents omit those records. These are development-data counts, not market traction.
+- Legacy UI promotional counts, accuracy badges and government-verification language remain unvalidated copy. Styling, routes and frontend source were preserved in this milestone; those labels must not be presented as measured product results.
+- Forecast quality, source licensing/provenance, government evidence, drive-time estimates, construction authenticity and full society/investor workflows require further validation. Billing is a prototype.
+- Backend dependency ranges, permissive CORS, deployment hardening and test-client/build warnings need follow-up before production. Public source does not make the laptop deployment production-ready.
+
+The next milestone is a focused product implementation/provenance audit, followed by one evidence-backed capability at a time. See [the FYP roadmap](docs/RIHAISH_FYP_ROADMAP.md). Historical DDS documents are retained with qualifications; raw local reports/data remain private.

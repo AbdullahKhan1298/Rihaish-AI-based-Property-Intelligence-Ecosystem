@@ -1,4 +1,14 @@
-# RIHAISH recovered implementation — October 26, 2026 (Asia/Karachi)
+# RIHAISH FYP handoff — November 1, 2026 (Asia/Karachi)
+
+The DDS assessment passed per the owner. The active phase is the preserved FYP/product baseline; see root README, `FYP_CURRENT_STATUS.md`, `FYP_SUPERVISOR_DEMO.md` and `RIHAISH_FYP_ROADMAP.md`. Git/main was initialized on November 1, with separate baseline and artificial-population retirement commits. The old statements below about missing Git describe the October recovery only.
+
+The DDS-only massive synthetic-user tool and its dedicated test are removed. Real read-only sampling survives as `verify_dds_smoke.py`; k6, concurrency/auth fixtures, overload handling, database adapter/launch/migration/failure tools and all original data remain. Retired guides and local raw evidence are not erased.
+
+Publication is source-only: local credentials/DBs/rqlite stores/scraped data/backups/raw reports excluded. The actual configured JWT key is unchanged; a fresh clone must explicitly configure its own SECRET_KEY. The current local data is not shipped in public Git. See the current checkpoint and publication receipt for the remote/commit status; never invent a pushed state.
+
+Current November verification passes: 21 isolated tests, frontend build, real SQL/health/API sampling, actual auth/RBAC/OTP/watchlist, seven-file/frontend preservation and 31-table source/cluster hashes. No failover or k6 rerun was needed. Existing forecasting/legal/traffic/construction/traction claims remain unvalidated prototype content. The next scope is an evidence/provenance audit, not a rewrite.
+
+## Historical recovered implementation — October 26, 2026
 
 ## Read this first
 

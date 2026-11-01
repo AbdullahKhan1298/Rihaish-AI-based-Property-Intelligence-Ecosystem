@@ -19,14 +19,31 @@ from app.api.routes_properties import format_property_row, prefetch_details
 class SQLTranslationTests(unittest.TestCase):
     def test_batched_details_preserve_existing_property_shape(self):
         for city in ('karachi', 'lahore', 'islamabad'):
-            path = ROOT / 'backend/app/db/shards' / f'shard_{city}_primary.db'
-            conn = sqlite3.connect(path.as_uri() + '?mode=ro', uri=True)
+            conn = sqlite3.connect(':memory:')
             conn.row_factory = sqlite3.Row
             try:
+                conn.executescript((ROOT / 'backend/app/db/shard_schema.sql').read_text(encoding='utf-8'))
+                conn.execute("INSERT INTO societies(id,name,city,type,tier,growth_rate_pct,avg_price_sqyd,facility_score) VALUES ('fixture-society','Fixture society',?,'Fixture','Fixture',0,0,0)", (city,))
+                for index in range(2):
+                    prop = dict(id=f'{city}-fixture-{index}', society_id='fixture-society', society_name='Fixture society',
+                                city=city, title='Fixture plot', type='Plot', subtype='Residential Plot',
+                                price=1000000+index*1000, price_formatted='Fixture price', price_per_sqft='Fixture unit price',
+                                size='Fixture size', size_numeric=100, completion_status='Under Construction', completion_pct=25,
+                                ai_investment_score=5, recommendation='Fixture only', confidence_pct=0,
+                                forecast_3yr_yield='Not evaluated', images_json='["fixture-image"]')
+                    conn.execute('INSERT INTO properties ('+','.join(prop)+') VALUES ('+','.join('?' for _ in prop)+')', list(prop.values()))
+                first = f'{city}-fixture-0'
+                conn.execute("INSERT INTO government_records(id,property_id,title,noc_number,issuing_authority,status_type,transfer_type,verification_date,is_verified) VALUES ('g',?,'Fixture record','TEST-NOT-A-NOC','Fixture','Unverified','Fixture','2026-01-01',0)", (first,))
+                conn.executemany('INSERT INTO price_history(id,property_id,year_label,price,is_projection) VALUES (?,?,?,?,0)', [('b',first,'2026',1000000),('a',first,'2025',900000)])
+                conn.execute("INSERT INTO facilities(id,name,type,city) VALUES ('f','Fixture school','school',?)", (city,))
+                conn.execute("INSERT INTO property_facility_proximity(id,property_id,facility_id,facility_name,facility_type,distance_km,drive_time_min,rating) VALUES ('p',?,'f','Fixture school','school','0.5 km','2 min',4)", (first,))
+                conn.execute("INSERT INTO progress_reports(id,property_id,society_id,title,report_date,completion_pct,status) VALUES ('m',?,'fixture-society','Fixture milestone','2026-01-01',25,'In Progress')", (first,))
                 rows = conn.execute('SELECT * FROM properties ORDER BY id LIMIT 5').fetchall()
                 details = prefetch_details(conn, [r['id'] for r in rows])
                 for row in rows:
                     self.assertEqual(format_property_row(row, conn.cursor()), format_property_row(row, conn.cursor(), details))
+                self.assertEqual([r['year'] for r in format_property_row(rows[0], conn.cursor(), details)['priceHistory']], ['2025','2026'])
+                self.assertFalse(format_property_row(rows[1], conn.cursor(), details)['leaseStatus']['verified'])
             finally:
                 conn.close()
 
@@ -74,6 +91,24 @@ class ProcessLaunchTests(unittest.TestCase):
             self.assertTrue(done.exists(), 'Child logging stalled after launcher exited')
             self.assertEqual(output.stat().st_size, 131072)
             self.assertEqual(errors.stat().st_size, 131072)
+            # The marker is written just before child exit. Windows cannot
+            # remove its log files until the inherited handles are released.
+            if os.name == 'nt':
+                import ctypes
+                from ctypes import wintypes
+                kernel = ctypes.WinDLL('kernel32', use_last_error=True)
+                kernel.OpenProcess.argtypes = (wintypes.DWORD, wintypes.BOOL, wintypes.DWORD)
+                kernel.OpenProcess.restype = wintypes.HANDLE
+                kernel.WaitForSingleObject.argtypes = (wintypes.HANDLE, wintypes.DWORD)
+                kernel.CloseHandle.argtypes = (wintypes.HANDLE,)
+                handle = kernel.OpenProcess(0x00100000, False, int(result.stdout.strip()))
+                if handle:
+                    try:
+                        self.assertEqual(kernel.WaitForSingleObject(handle, 10000), 0, 'Owned log-test child did not exit')
+                    finally:
+                        kernel.CloseHandle(handle)
+                else:
+                    self.assertEqual(ctypes.get_last_error(), 87, 'Unable to inspect owned log-test child')
 
 
 class CatalogTests(unittest.TestCase):

@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+app/db/shards/
+app/db/scraped_data/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.log
+.venv/
+venv/

@@ -58,7 +58,10 @@ def cleanup(fixture):
         assert not client.query([['SELECT id FROM users WHERE id=?', user['id']]])[0].get('values')
 
 
-def verify(keep=False):
+def verify(keep=False, output=None):
+    report_path = (output or ROOT / 'docs/evidence/live-auth-verification.json').resolve()
+    if not report_path.is_relative_to((ROOT / 'docs/evidence').resolve()):
+        raise RuntimeError('Verification reports must stay under docs/evidence')
     client = ClusterClient()
     baseline_users = client.query([['SELECT COUNT(*) FROM users']])[0]['values'][0][0]
     run = uuid.uuid4().hex
@@ -125,8 +128,8 @@ def verify(keep=False):
             evidence['users_after'] = client.query([['SELECT COUNT(*) FROM users']])[0]['values'][0][0]
             assert evidence['users_after'] == baseline_users
     evidence['completed_at'] = datetime.now().astimezone().isoformat()
-    path = ROOT / 'docs/evidence/live-auth-verification.json'
-    path.write_text(json.dumps(evidence, indent=2), encoding='utf-8')
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(evidence, indent=2), encoding='utf-8')
     print(json.dumps(evidence, indent=2))
     if keep:
         print('Private evaluation credentials: ' + str(private_path))
@@ -136,6 +139,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--keep-fixtures', action='store_true')
     parser.add_argument('--cleanup', type=Path)
+    parser.add_argument('--output', type=Path, help='Separate report under docs/evidence; preserves historical reports')
     args = parser.parse_args()
     if args.cleanup:
         fixture_path = args.cleanup.resolve()
@@ -144,4 +148,4 @@ if __name__ == '__main__':
         cleanup(json.loads(fixture_path.read_text(encoding='utf-8')))
         print('Only the named evaluation fixtures were removed')
     else:
-        verify(args.keep_fixtures)
+        verify(args.keep_fixtures, args.output)

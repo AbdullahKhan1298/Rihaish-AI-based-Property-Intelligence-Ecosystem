@@ -1,3 +1,29 @@
+# Codex checkpoint — November 1, 2026
+
+Current milestone: FYP transition and safe GitHub source baseline. The owner reports the DDS evaluation passed. No architecture redesign, database reset or AI/ML rewrite was performed.
+
+## Current completed work
+
+- Private snapshot `.runtime/backups/fyp-baseline-20261101T114444Z-f3f5da/`: 265 source files plus consistent SQLite-backup-API copies of all seven original databases. Snapshot includes local configuration privately; never publish it.
+- Initialized Git/main after confirming no metadata/remotes existed. Baseline commit `3bcb382865a20745becfbf850633515df9835e9b`; separate retirement commit `61743d1ba092b4a468ec3de3f38a08261a8235e1`.
+- Removed only `scripts/demo_million_users.py` and its exclusive test. Preserved bounded real HTTP/SQL/health sampling as `scripts/verify_dds_smoke.py`. Historical guides marked retired; no fixture DB/raw evidence deleted. See `FYP_MASSIVE_USER_CLEANUP.md` for categories, hashes and scope.
+- Strong Git/data/secret exclusions; safe `.env.example`; shared hard-coded signing fallback removed while the actual ignored `.env` and key remained byte-for-byte unchanged. Publication scanner checks staged content/history, known local secret values, signatures, private paths and large blobs. Windows installed dependency closure pinned separately.
+- 21 isolated tests PASS, frontend build PASS, real read-only SQL/API/frontend-proxy smoke PASS, actual rqlite JWT/RBAC/OTP/watchlist PASS, all seven original hashes/frontend unchanged, all 31 original table counts/content hashes match a consistent cluster backup. Caddy config valid. No disruptive failover/load test repeated.
+- Source-only reproducibility check: 21 tests PASS in 3.671 s without private .env/DBs, using the installed dependencies and an ephemeral key. Replaced the batching test's private-data input with tiny in-memory fixtures; fixed its separate launch test's Windows log cleanup race by waiting for the exact owned child to exit. Initial failed source-only report retained locally. A fresh pip-install validation is not claimed.
+- Browser Home/search/detail and unauthenticated admin→login navigation verified. Legacy unsupported UI promotional labels remain unchanged and documented as prototype copy, not product evidence.
+- Root README, `FYP_CURRENT_STATUS.md`, `FYP_SUPERVISOR_DEMO.md`, `RIHAISH_FYP_ROADMAP.md` and public verification summary prepared. Raw November verification under ignored `docs/evidence/fyp-transition-20261101/`; smoke under `docs/evidence/fyp-smoke-20261101T115811Z-b95468/`.
+- Existing GCM GitHub auth works as AbdullahKhan1298; no RIHAISH remote previously existed. Created the explicitly requested public repository: `https://github.com/AbdullahKhan1298/Rihaish-AI-based-Property-Intelligence-Ecosystem`. Final documentation commit, staged/history scan and push confirmation are the remaining publication actions at this checkpoint.
+
+## Exact next action
+
+Complete the source-only publication gate, commit the FYP documentation/security/tooling changes, push main without force, and verify the remote HEAD/tree. Then record the publication receipt. The next development milestone after publication is the scoped product implementation/provenance audit in `RIHAISH_FYP_ROADMAP.md`; do not start a forecast/database/frontend rewrite during it.
+
+Runtime: retained three voters and two APIs/Caddy/Vite started normally from existing stores for checks. No import, original-record cleanup or node failure. Auth fixtures were exact-owned and cleaned (users 0→0). Retained data: 224 properties/18 societies/134 inherited missing society references. Sustained-load qualification remains open; synthetic population work is retired.
+
+## Historical DDS checkpoint — retained below
+
+The following October notes are history, not the current work order. The November FYP task supersedes the earlier manual-only verification restriction for the normal non-disruptive checks performed above.
+
 # Codex checkpoint — October 26, 2026
 
 Current work: graceful overload rejection/recovery. Implementation is present; final gateway deployment and smaller HTTP rehearsal are PENDING MANUAL EXECUTION at the user's request after automatic permission-review timeouts. Follow `DDS_GRACEFUL_OVERLOAD_GUIDE.md`. Do not report the whole feature as passed. Million-client capacity remains unverified.

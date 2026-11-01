@@ -52,7 +52,7 @@ def private_path(name):
 
 
 def staged_blobs():
-    result = {}
+    result = set()
     for record in git('ls-files', '--stage', '-z').split(b'\0'):
         if not record:
             continue
@@ -60,16 +60,22 @@ def staged_blobs():
         _, oid, stage = metadata.split()
         if stage != b'0':
             raise RuntimeError('Resolve staged conflicts before publication')
-        result[oid.decode()] = name.decode('utf-8')
+        result.add((oid.decode(), name.decode('utf-8')))
     return result
 
 
 def historical_blobs():
-    result = {}
-    for line in git('rev-list', '--objects', '--all').splitlines():
-        oid, _, name = line.partition(b' ')
-        if name:
-            result[oid.decode()] = name.decode('utf-8')
+    result = set()
+    # Inspect every commit tree: rev-list --objects alone can omit alternative
+    # paths for identical content, concealing an empty/private-path duplicate.
+    for commit in git('rev-list', '--all').splitlines():
+        for entry in git('ls-tree', '-r', '-z', commit.decode()).split(b'\0'):
+            if not entry:
+                continue
+            metadata, name = entry.split(b'\t', 1)
+            _, kind, oid = metadata.split()
+            if kind == b'blob':
+                result.add((oid.decode(), name.decode('utf-8')))
     return result
 
 
@@ -79,14 +85,18 @@ def scan(history=False):
         blobs.update(historical_blobs())
     secrets = local_secrets()
     issues, files, total_bytes = [], 0, 0
-    for oid, name in blobs.items():
+    seen = set()
+    for oid, name in sorted(blobs):
+        if private_path(name):
+            issues.append({'path': name, 'kind': 'private-or-unapproved-data-path'})
+        if oid in seen:
+            continue
+        seen.add(oid)
         if git('cat-file', '-t', oid).strip() != b'blob':
             continue
         content = git('cat-file', 'blob', oid)
         files += 1
         total_bytes += len(content)
-        if private_path(name):
-            issues.append({'path': name, 'kind': 'private-or-unapproved-data-path'})
         if len(content) > 5 * 1024 * 1024:
             issues.append({'path': name, 'kind': 'large-blob-over-5MiB'})
         for key, value in secrets.items():

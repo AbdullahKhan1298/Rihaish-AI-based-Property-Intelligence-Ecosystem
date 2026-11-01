@@ -1,5 +1,6 @@
 """Read-only source preservation and current migrated-integrity evidence."""
 import hashlib
+import argparse
 import json
 import sqlite3
 import sys
@@ -11,7 +12,10 @@ sys.path.insert(0, str(ROOT / 'backend'))
 from app.db.rqlite import ClusterClient
 
 
-def verify():
+def verify(output=None):
+    report_path = (output or ROOT / 'docs/evidence/current-data-verification.json').resolve()
+    if not report_path.is_relative_to((ROOT / 'docs/evidence').resolve()):
+        raise RuntimeError('Verification reports must stay under docs/evidence')
     inventory = json.loads((ROOT / 'docs/evidence/recovery-inventory.json').read_text())
     files = {name: hashlib.sha256((ROOT / 'backend/app/db/shards' / name).read_bytes()).hexdigest() == info['source_sha256']
              for name, info in inventory['databases'].items()}
@@ -40,9 +44,12 @@ def verify():
               'impact': ['Property search reads denormalized society_name and retains orphaned listings.',
                          'Society joins omit 134 properties whose society_id has no parent row.',
                          'Foreign keys apply to new writes; no missing parent societies were fabricated.']}
-    (ROOT / 'docs/evidence/current-data-verification.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(result, indent=2), encoding='utf-8')
     print(json.dumps(result, indent=2))
 
 
 if __name__ == '__main__':
-    verify()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output', type=Path, help='Separate report under docs/evidence; preserves historical reports')
+    verify(parser.parse_args().output)

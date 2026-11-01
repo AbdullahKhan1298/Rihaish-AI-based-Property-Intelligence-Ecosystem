@@ -1,5 +1,7 @@
 # DDS evaluator walkthrough (Windows, loopback)
 
+> November 1 FYP baseline: the real architecture/commands remain supported. Use `FYP_SUPERVISOR_DEMO.md` for current submission; artificial population generation is retired. Caddy configuration and normal routing were verified on November 1; larger overload/sustained-load acceptance remains unresolved. Historical evidence is retained locally, not shipped with public source.
+
 Graceful overload follow-up: [DDS_GRACEFUL_OVERLOAD_GUIDE.md](DDS_GRACEFUL_OVERLOAD_GUIDE.md). Implementation is partially verified; final gateway validation and 32-request/4-client rehearsal are pending manual execution at the user's request. Do not represent this as passed million-client testing.
 
 For the October 27 live presentation, use [DDS_FINAL_DEMO_COMMANDS.md](DDS_FINAL_DEMO_COMMANDS.md). It contains the October 26 controlled rehearsal, exact commands, recovery and a 7–10 minute walkthrough. Its `--single-node-only` option on the existing verifier keeps two voters online. The default verifier later in this historical runbook also tests majority loss and is not needed for the final live presentation. Sustained-load acceptance remains unresolved.
