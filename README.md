@@ -15,11 +15,7 @@ RIHAISH's goal is to bring that information into a traceable workflow for buyers
 - Present property/society information with price trajectories, facility-distance estimates, government-record fields and construction-update views.
 - Keep relational data replicated across three rqlite voters, with two FastAPI instances behind Caddy.
 
-The reliable distributed data layer is implemented and functionally verified. The intelligence modules and commercial workflows are a prototype: forecasts are not validated investment returns, government-record fields are not independent title certification, and payments are not a production payment integration.
-
-**No customer-population or production-scale claim is made.** The DDS-only massive synthetic-user generator has been retired. Legitimate k6 and concurrency tests remain; sustained-load acceptance is unresolved.
-
-See [current FYP status](docs/FYP_CURRENT_STATUS.md), [supervisor demo](docs/FYP_SUPERVISOR_DEMO.md), and [roadmap](docs/RIHAISH_FYP_ROADMAP.md).
+The reliable distributed data layer is implemented and functionally verified. The intelligence modules and commercial workflows are a prototype.
 
 ## Architecture
 
@@ -48,7 +44,7 @@ A controlled ten-property query comparison reduced database HTTP calls from **42
 - React 18, React Router, Vite 6, Tailwind CSS, Recharts and Lucide.
 - Python 3.12, FastAPI/Pydantic, Uvicorn, HTTPX, JWT and bcrypt.
 - rqlite 10.6.5, Caddy 2.11.7; optional k6 2.3.0 for retained load tests.
-- NumPy, pandas and scikit-learn dependencies support the prototype intelligence code. The current trajectory engine includes growth assumptions/backcasts; out-of-sample forecasting accuracy is not established.
+- NumPy, pandas and scikit-learn dependencies support the prototype intelligence code. The current trajectory engine includes growth assumptions/backcasts.
 
 ## Local setup — Windows PowerShell
 
@@ -111,7 +107,7 @@ npm.cmd run dev -- --host 127.0.0.1 --port 3000 --strictPort
 
 Open http://127.0.0.1:3000 and API documentation at http://127.0.0.1:8000/docs. Reuse healthy processes rather than launching duplicates. Do not run legacy `start_servers.bat` alongside DDS: its single API conflicts with Caddy's port.
 
-SQLite is retained as an explicitly selected legacy/local mode; the DDS launchers always select `RIHAISH_DB_BACKEND=rqlite`. There is no automatic SQLite fallback on cluster failure.
+SQLite is retained as an explicitly selected legacy/local mode; the DDS launchers always select `RIHAISH_DB_BACKEND=rqlite`.
 
 ## Verification
 
@@ -128,16 +124,14 @@ python scripts/verify_dds_auth.py --output docs/evidence/fyp-auth.json
 python scripts/check_publication.py --history
 ```
 
-The live auth verifier creates and cleans only its own UUID-labelled fixtures and sends no mail. On this working copy there were zero original users; tests do not claim real customer migration. `verify_dds_data.py` additionally checks private recovery manifests/source files on the retained machine. Use the migration verifier with your own authorized snapshots on a fresh clone.
 
 Do **not** run root `test_e2e_full.py` against retained data: it is a destructive historical test. Controlled real node-failure commands remain in the DDS runbook; they are not necessary for normal startup or every commit. The unchanged k6 runner is `scripts/run_k6.ps1`; preserve failed results and interpret actual completed-request counts before making acceptance claims.
 
 ## Known limitations and next milestone
 
-- Sustained-load/large-burst qualification is open; no million-user capacity claim. Overload admission code is retained, with incomplete end-to-end overload acceptance.
+- Sustained-load/large-burst qualification is open. Overload admission code is retained, with incomplete end-to-end overload acceptance.
 - The current retained copy has 224 properties, 18 societies and 134 inherited missing society references. Search retains denormalized listings; joins to missing parents omit those records. These are development-data counts, not market traction.
 - Legacy UI promotional counts, accuracy badges and government-verification language remain unvalidated copy. Styling, routes and frontend source were preserved in this milestone; those labels must not be presented as measured product results.
 - Forecast quality, source licensing/provenance, government evidence, drive-time estimates, construction authenticity and full society/investor workflows require further validation. Billing is a prototype.
 - Backend dependency ranges, permissive CORS, deployment hardening and test-client/build warnings need follow-up before production. Public source does not make the laptop deployment production-ready.
 
-The next milestone is a focused product implementation/provenance audit, followed by one evidence-backed capability at a time. See [the FYP roadmap](docs/RIHAISH_FYP_ROADMAP.md). Historical DDS documents are retained with qualifications; raw local reports/data remain private.
