@@ -1,5 +1,7 @@
 # Evaluator request: one million simultaneous active users
 
+> **Historical DDS requirement, retired from the current FYP demonstration on November 1, 2026.** The synthetic population mechanism is removed. This document retains the actual failed load-test evidence and its qualifications; it is not a current customer-count or capacity claim. Legitimate k6 tools remain available. See `FYP_MASSIVE_USER_CLEANUP.md`.
+
 Confirmed by the user on October 26, 2026: the requirement means **1,000,000 concurrent active users**, not accounts or cumulative requests. This requirement is **NOT VERIFIED**. No million-user workload was launched and no million-user capacity result is claimed.
 
 Later the user explicitly authorized an alternative using synthetic data and simulation. That alternative is implemented and actually executed: see `DDS_MILLION_SIMULATION_GUIDE.md` and `evidence/million-simulation-20261026T052601Z-f11db3/report.html`. It contains one million isolated fixture rows and a million-user virtual-time model, with a separate small live API sample. It does not establish the real concurrency target described here.

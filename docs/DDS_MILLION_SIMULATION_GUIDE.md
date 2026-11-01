@@ -1,5 +1,7 @@
 # One-million-user simulation — evaluator walkthrough
 
+> **RETIRED — November 1, 2026.** This DDS-only population demonstration is no longer an active tool or FYP product claim. Its generator and generator-specific tests were removed; the commands below are preserved as historical context and must not be rerun. No fixture database or raw result was deleted. Use `scripts/verify_dds_smoke.py` for the preserved real read-only API/SQL/health checks, and `docs/FYP_MASSIVE_USER_CLEANUP.md` for scope/provenance.
+
 Implemented and executed October 26, 2026, 10:26 Asia/Karachi. This is a **synthetic-data and virtual-time simulation**, with a separate small real API sample. It is not a passed million-concurrent-user application load test. The original k6 workload and its failed reports remain unchanged.
 
 ## What you can show
