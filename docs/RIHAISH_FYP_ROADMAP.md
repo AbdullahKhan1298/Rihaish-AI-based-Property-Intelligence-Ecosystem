@@ -4,7 +4,7 @@ One milestone at a time: recover context → define a focused outcome → preser
 
 | Milestone | State | Outcome and acceptance gate |
 |---|---|---|
-| 0. Safe source baseline | Completed locally; publication receipt tracked separately | Recoverable private snapshot, preserved DDS/data/frontend/auth, retired artificial population tool, safe Git history, current checks and supervisor docs. |
+| 0. Safe source baseline | Completed and published; receipt in GITHUB_PUBLICATION.md | Recoverable private snapshot, preserved DDS/data/frontend/auth, retired artificial population tool, scanned Git history, verified remote source/tree, current checks and supervisor docs. |
 | 1. Product implementation/provenance audit | Next | Map screens, endpoints, roles, data sources, algorithms and claims. Identify observed/generated/estimated/predicted values; create a prioritized gap list. Reuse DDS findings rather than repeat that audit. |
 | 2. Real ingestion and provenance | Planned | Authorized sources/licensing, source URLs/timestamps, listing-type/unit validation, deduplication, freshness, missing-parent analysis and ingestion tests. Never silently repair retained records. |
 | 3. Forecasting validation | Planned | Build a genuinely observed time-series dataset, temporal holdouts, simple baselines, documented errors/uncertainty and leakage checks. Remove unsupported accuracy claims through an approved content change. Publish no invented ROI. |

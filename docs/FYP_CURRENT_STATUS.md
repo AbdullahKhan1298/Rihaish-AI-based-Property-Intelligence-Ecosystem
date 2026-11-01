@@ -45,7 +45,7 @@ Legacy UI promotional counters, accuracy/ROI/verification language and simulated
 - New main-branch Git baseline, followed by a separate artificial-population retirement commit.
 - Removed only the DDS massive population/queue generator and its exclusive test. Preserved its legitimate read-only sampling as `verify_dds_smoke.py`. No fixture/database data was deleted.
 - Safe environment example, explicit configured signing key with existing local key unchanged, data/secret exclusions, staged/history publication gate and its tests.
-- Source-only GitHub preparation, README, supervisor demo and milestone roadmap. Original raw evidence remains local and ignored; public verification is summarized in `docs/verification/FYP_BASELINE_2026-11-01.md`.
+- Public source-only GitHub publication confirmed: main source commit `40f65dd25059ed1442c6d137c2665fd167b7f759`, 122 expected files, matching local/remote tree, current README and FYP documents present. Receipt in `GITHUB_PUBLICATION.md`. Original raw evidence remains local and ignored; public verification is summarized in `docs/verification/FYP_BASELINE_2026-11-01.md`.
 
 ## Verification observed November 1
 

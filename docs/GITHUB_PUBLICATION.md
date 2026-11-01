@@ -29,4 +29,13 @@ The source-only repo requires authorized private data for an end-to-end local de
 
 ## Publication receipt
 
-Final push and remote HEAD/tree checks are recorded here only after they actually succeed. At document preparation, repository creation is confirmed and source push is pending.
+Confirmed November 1, 2026 at 12:19:15 UTC (17:19 Asia/Karachi):
+
+- `git push -u origin main` succeeded without force.
+- FYP source commit: `40f65dd25059ed1442c6d137c2665fd167b7f759` (`docs: prepare verified FYP baseline and supervisor submission`).
+- `git ls-remote origin refs/heads/main` matched local HEAD.
+- Unauthenticated official GitHub API confirmed public visibility, exact commit/tree match, all 122 expected source files and the current problem/solution README.
+- Required DDS/auth/SQL/migration/k6 files and FYP docs present; database/runtime/raw-data paths and retired generator/test absent from the active remote tree.
+- Staged/reachable-history scan: 136 unique blobs, 1,200,541 bytes inspected, three known local secret values checked without disclosure, zero findings. Private-path exclusions and whitespace check passed.
+
+This receipt and checkpoint are a follow-up documentation commit; the source milestone hash above remains the independently verified product baseline. The final branch hash should always be checked with `git rev-parse HEAD` and `git ls-remote origin refs/heads/main` rather than guessed or embedded self-referentially.

@@ -22,4 +22,4 @@ Warnings: installed Starlette test-client/HTTPX deprecation; frontend chunk >500
 
 Not repeated: disruptive node failure, large-burst overload, k6 or external mail/payment/government-provider calls. Prior real failure/recovery and uniqueness evidence remains; historical failed sustained-load results are not upgraded to passing. Forecast accuracy, government authenticity, construction audit, traffic estimates and commercial readiness remain qualified in the FYP status document.
 
-Publication gate and GitHub push receipts are recorded separately after inspecting staged content and all intended history. No Git LFS is needed for this small source-only tree; large/private runtime artifacts are not tracked.
+Publication gate passed with zero findings across staged content and reachable history. Public source commit `40f65dd25059ed1442c6d137c2665fd167b7f759` and all 122 source paths were independently confirmed through GitHub's unauthenticated API; see `GITHUB_PUBLICATION.md`. No Git LFS is needed for this small source-only tree; large/private runtime artifacts are not tracked.
