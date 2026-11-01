@@ -1,0 +1,26 @@
+{
+    admin off
+    auto_https off
+}
+
+http://127.0.0.1:8000 {
+    reverse_proxy 127.0.0.1:8001 127.0.0.1:8002 {
+        lb_policy round_robin
+        health_uri /api/health/live
+        health_interval 5s
+        health_timeout 3s
+        fail_duration 5s
+    }
+    # A gateway error does not establish whether an upstream write committed.
+    handle_errors 502 503 504 {
+        header {
+            Content-Type application/json
+            Retry-After 1
+            Cache-Control no-store
+            Access-Control-Allow-Origin *
+            X-Rihaish-Instance proxy
+        }
+        respond `{"detail":"Service temporarily unavailable. Check operation state before retrying writes.","code":"gateway_unavailable"}` 503
+    }
+}
+
